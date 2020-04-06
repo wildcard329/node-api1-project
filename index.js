@@ -1,10 +1,11 @@
 const express = require('express');
 const shortid = require('shortid');
+// const cors = require('cors');
 
 const server = express();
 
 server.use(express.json());
-server.use(cors());
+// server.use(cors());
 
 let users = [
     {
@@ -54,25 +55,25 @@ server.post('/api/users', (req, res) => {
     }
 });
 
-server.put('/api/users/:id', (req, res => {
+server.put('/api/users/:id', (req, res) => {
     const id = req.params.id;
     const matching = users.some(user => user.id === parseInt(id));
 
     if (matching) {
         const editUser = req.body;
         users.forEach(user => {
-            if(user.id === parseInt(id)) {
-                user.name = editUser.name ? editUser.name : user.name;
-                user.bio = editUser.bio ? editUser.bio : user.bio;
-                res.status(200).json(users)
-            }
-        });
+            user.name = editUser.name ? editUser.name : user.name;
+            user.bio = editUser.bio ? editUser.bio : user.bio;
+            res.status(200).json(users);
+        })
+    } else if (!matching) {
+        res.status(404).json({ message: "The user with the specified ID does not exist." })
     } else if (!users.name || !users.bio) {
         res.status(400).json({ errorMessage: "Please provide name and bio for the user." })
     } else {
         res.status(500).json({ errorMessage: "The user information could not be modified." })
     }
-}))
+})
 
 const port = 5000;
 server.listen(port, () => console.log(`API running on port ${port}`));
